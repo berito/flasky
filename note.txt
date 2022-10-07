@@ -1,0 +1,4 @@
+#installing virtual environemnt
+sudo apt-get install python3-venv
+# creatinf virtual environment
+ python3 -m venv [virtual_env_name]
