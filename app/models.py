@@ -1,28 +1,48 @@
-
+import hashlib
 from datetime import datetime
 from operator import index
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin, AnonymousUserMixin
-from flask import current_app
+from flask_login import UserMixin, AnonymousUserMixin, current_user
+from flask import current_app, request
 from . import login_manager
 from . import db
 
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
+    avatar_hash = db.Column(db.String(32))
     name = db.Column(db.String(64))
     location = db.Column(db.String(64))
     about_me = db.Column(db.Text())
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     email = db.Column(db.String(64), unique=True, index=True)
     username = db.Column(db.String(64), unique=True)
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    def __init__(self, **kwargs):
+        if self.email is not None and self.avatar_hash is None:
+            self.avatar_hash = self.gravatr_hash()
+
+    def graavatr_hash(self):
+        return hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+
+    def gravatar(self, size=100, default='identicon', rating='g'):
+        if request.is_secure:
+            url = 'https://secure.gravatar.com/avatar'
+        else:
+            url = 'https://www.gravatar.com/avatar'
+
+        hash = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+        return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
+               url=url, hash=hash, size=size, default=default, rating=rating)
 
     def ping(self):
         self.last_seen = datetime.utcnow()
@@ -74,6 +94,14 @@ class User(UserMixin, db.Model):
         return '<User %r>' % self.username
 
 
+class Post(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.Text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -106,6 +134,18 @@ class Role(db.Model):
             db.session.add(role)
         db.session.commit()
 
+    @staticmethod
+    def update_user_role():
+        admin_role = Role.query.filter_by(name='Administrator').first()
+        default_role = Role.query.filter_by(default=True).first()
+        for u in User.query.all():
+            print(current_app.config['FLASKY_ADMIN'])
+            if u.role is None:
+                if u.email == current_app.config['FLASKY_ADMIN']:
+                    u.role = admin_role
+                else:
+                    u.role=default_role
+        db.session.commit()
     def add_permission(self, perm):
         if not self.has_permission(perm):
             self.permissions += perm
