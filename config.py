@@ -12,6 +12,7 @@ class Config:
         'MAIL_USERNAME') or 'mohammedsrajk@gmail.com'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'dvdnyroecwhkwhpn'
     FLASKY_POSTS_PER_PAGE=os.environ.get('FLASKY_POSTS_PER_PAGE') or 5
+    FLASKY_FOLLOWERS_PER_PAGE=os.environ.get('FLASKY_FOLLOWERS_PER_PAGE') or 5
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN') or 'mohammedsrajk@gmail.com'
