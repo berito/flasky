@@ -1,5 +1,6 @@
-{%extends "bootstrap/base.html"%} {%block title%}Flasky{%endblock%} {% block
-head %} {{ super() }}
+{%extends "bootstrap/base.html"%} 
+{%block title%}Flasky{%endblock%}
+ {% block head %} {{ super() }}
 <link
   rel="shortcut icon"
   href="{{ url_for('static', filename='favicon.ico') }}"
@@ -41,12 +42,14 @@ head %} {{ super() }}
         <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
         {% else %}
         <li><a href="{{ url_for('auth.login') }}">Log In</a></li>
-        {% endif %} {%if current_user.is_authenticated%}
+        {% endif %}
+        {%if current_user.is_authenticated%}
         <li>
           <a href="{{url_for('main.user',username=current_user.username)}}">
             Profile
           </a>
         </li>
+       
         {%endif%}
       </ul>
     </div>
