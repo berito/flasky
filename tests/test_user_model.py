@@ -3,6 +3,7 @@ from app.models import AnonymouseUser, Permission, User
 
 
 class UserModelTestCase(unittest.TestCase):
+
     def test_password_setter(self):
         u = User(password='cat')
         self.assertTrue(u.password_hash is not None)
@@ -14,8 +15,9 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue(u.can(Permission.WRITE))
         self.assertFalse(u.can(Permission.MODERATE))
         self.assertFalse(u.can(Permission.ADMIN))
+
     def test_anonymous_user(self):
-        u=AnonymouseUser()
+        u = AnonymouseUser()
         self.assertFalse(u.can(Permission.FOLLOW))
         self.assertFalse(u.can(Permission.COMMENT))
         self.assertFalse(u.can(Permission.WRITE))

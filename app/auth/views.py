@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from . import auth
 from .forms import LoginForm, RegistrationForm
-from ..models import User
+from ..models import User,Post
 from .. import db
 from ..email import send_email
 

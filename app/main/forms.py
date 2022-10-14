@@ -15,3 +15,6 @@ class EditProfileForm(FlaskForm):
     location=StringField('Location',validators=[Length(0,64)])
     about_me=TextAreaField('About me')
     sumbit=SubmitField('Submit')
+class CommentForm(FlaskForm):
+    body=StringField('',validators=[DataRequired()])
+    submit=SubmitField('Submit')
